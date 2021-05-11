@@ -13,7 +13,7 @@ Job Core
 ```
 dependencies {
     ...
-    classpath 'io.github.alexmofer.job:job-core:1.0.0'
+    implementation 'io.github.alexmofer.job:job-core:1.0.0'
     ...
 }
 ```
