@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference;
  * 基础任务
  * Created by Alex on 2021/3/1.
  */
+@SuppressWarnings("ALL")
 abstract class BaseJob<C> {
     public static final int PRIORITY_LOW = -1;// 低优先级
     public static final int PRIORITY_MIDDLE = 0; // 中优先级
@@ -32,6 +33,7 @@ abstract class BaseJob<C> {
     private int mId;
     private Object mTag;
     private int mPriority = PRIORITY_MIDDLE;
+    private long mTime;
 
     public BaseJob(Params params, Traverse traverse,
                    C callback, boolean weakCallback, int id, Object... values) {
@@ -246,6 +248,7 @@ abstract class BaseJob<C> {
      */
     public void execute(Executor executor) {
         final Task task = generateTask();
+        mTime = System.currentTimeMillis();
         task.onAttached(this);
         executor.execute(task);
     }
@@ -325,6 +328,28 @@ abstract class BaseJob<C> {
     protected void onProgress(C callback, Progress progress) {
     }
 
+    /**
+     * 排序后台任务
+     *
+     * @param job 任务
+     * @return 排序结果
+     */
+    protected int compareTo(Object other) {
+        if (other instanceof BaseJob) {
+            final BaseJob job = (BaseJob) other;
+            final int priority = mPriority;
+            final int priorityOther = job.mPriority;
+            if (priority == priorityOther) {
+                return Long.compare(mTime, job.mTime);
+            } else if (priority > priorityOther) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+        return 1;
+    }
+
     private void doInBackground() {
         final Result result = generateResult();
         doInBackground(result);
@@ -332,6 +357,7 @@ abstract class BaseJob<C> {
     }
 
     private void afterExecute(Task task) {
+        mTime = 0;
         task.onDetached(this);
         recycleTask(task);
     }
@@ -468,8 +494,6 @@ abstract class BaseJob<C> {
     public static class Task implements Comparable<Task> {
 
         private BaseJob<?> mJob;
-        private int mPriority;
-        private long mTime;
 
         /**
          * 绑定
@@ -478,8 +502,6 @@ abstract class BaseJob<C> {
          */
         protected void onAttached(BaseJob<?> job) {
             mJob = job;
-            mPriority = job.getPriority();
-            mTime = System.currentTimeMillis();
         }
 
         /**
@@ -490,7 +512,7 @@ abstract class BaseJob<C> {
         protected void onDetached(BaseJob<?> job) {
             if (mJob == job) {
                 mJob = null;
-                mTime = 0;
+
             }
         }
 
@@ -524,15 +546,7 @@ abstract class BaseJob<C> {
 
         @Override
         public int compareTo(Task task) {
-            final int priority = mPriority;
-            final int priorityOther = task.mPriority;
-            if (priority == priorityOther) {
-                return Long.compare(mTime, task.mTime);
-            } else if (priority > priorityOther) {
-                return 1;
-            } else {
-                return -1;
-            }
+            return mJob == null ? -1 : mJob.compareTo(task.mJob);
         }
     }
 }

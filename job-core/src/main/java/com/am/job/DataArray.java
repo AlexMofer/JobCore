@@ -19,6 +19,7 @@ package com.am.job;
  * 数据数组
  * Created by Alex on 2021/3/12.
  */
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 interface DataArray {
     /**
      * 设置数据
