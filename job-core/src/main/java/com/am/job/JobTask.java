@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.am.job.core;
+package com.am.job;
 
 import java.util.ArrayList;
 
@@ -21,12 +21,9 @@ import java.util.ArrayList;
  * 任务可执行者
  * Created by Alex on 2021/3/12.
  */
-class JobTask extends BaseJob.Task implements Comparable<JobTask>, Runnable {
+class JobTask extends BaseJob.Task implements Runnable {
 
     private static final ArrayList<JobTask> CACHED = new ArrayList<>();
-    private BaseJob.Executor mExecutor;
-    private int mPriority = BaseJob.PRIORITY_LOW;
-    private long mTime = 0;
 
     private JobTask() {
     }
@@ -49,44 +46,6 @@ class JobTask extends BaseJob.Task implements Comparable<JobTask>, Runnable {
         }
         synchronized (CACHED) {
             CACHED.add(task);
-        }
-    }
-
-    @Override
-    protected void onAttached(BaseJob<?> job) {
-        super.onAttached(job);
-        mPriority = job.getPriority();
-    }
-
-    @Override
-    public void beforeExecute(BaseJob.Executor executor) {
-        super.beforeExecute(executor);
-        mExecutor = executor;
-        mTime = System.currentTimeMillis();
-    }
-
-    @Override
-    public void afterExecute(BaseJob.Executor executor) {
-        super.afterExecute(executor);
-        mTime = 0;
-        mExecutor = null;
-    }
-
-    @Override
-    public int compareTo(JobTask o) {
-        final int priority = mPriority;
-        final int priorityOther = o.mPriority;
-        if (priority == priorityOther) {
-            if (mExecutor == o.mExecutor) {
-                // 同一执行者
-                return Long.compare(mTime, o.mTime);
-            } else {
-                return 0;
-            }
-        } else if (priority > priorityOther) {
-            return 1;
-        } else {
-            return -1;
         }
     }
 

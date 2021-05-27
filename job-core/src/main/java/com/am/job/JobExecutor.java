@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.am.job.core;
+package com.am.job;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * Executor
  * Created by Alex on 2017/9/11.
  */
-class JobExecutor extends ThreadPoolExecutor implements BaseJob.Executor {
+public class JobExecutor extends ThreadPoolExecutor implements BaseJob.Executor {
 
     public JobExecutor(int corePoolSize,
                        int maximumPoolSize,

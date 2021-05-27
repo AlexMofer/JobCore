@@ -13,54 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.am.job.core;
+package com.am.job;
 
 import java.util.ArrayList;
 
 /**
- * 使用HashMap实现的任务结果
+ * 使用HashMap实现的任务进度
  * Created by Alex on 2021/3/12.
  */
-class HashMapResult extends HashMapDataArray implements BaseJob.Result {
+class HashMapProgress extends HashMapDataArray implements BaseJob.Progress {
 
-    private static final ArrayList<HashMapResult> CACHED = new ArrayList<>();
+    private static final ArrayList<HashMapProgress> CACHED = new ArrayList<>();
 
-    private boolean mSuccess;
-
-    private HashMapResult() {
+    private HashMapProgress() {
     }
 
-    static HashMapResult get() {
-        final HashMapResult result;
+    static HashMapProgress get() {
+        final HashMapProgress progress;
         synchronized (CACHED) {
             if (CACHED.isEmpty()) {
-                result = new HashMapResult();
+                progress = new HashMapProgress();
             } else {
-                result = CACHED.remove(0);
+                progress = CACHED.remove(0);
             }
         }
-        result.clear();
-        return result;
+        progress.clear();
+        return progress;
     }
 
-    static void put(HashMapResult result) {
-        if (result == null) {
+    static void put(HashMapProgress progress) {
+        if (progress == null) {
             return;
         }
-        result.clear();
+        progress.clear();
         synchronized (CACHED) {
-            CACHED.add(result);
+            CACHED.add(progress);
         }
-    }
-
-    @Override
-    public void set(boolean success, Object... results) {
-        mSuccess = success;
-        setAll(results);
-    }
-
-    @Override
-    public boolean isSuccess() {
-        return mSuccess;
     }
 }

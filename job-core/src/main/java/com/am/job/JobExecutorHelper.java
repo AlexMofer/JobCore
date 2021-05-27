@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.am.job.core;
+package com.am.job;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -40,6 +40,7 @@ final class JobExecutorHelper {
 
         private final AtomicInteger mCount = new AtomicInteger(1);
 
+        @SuppressWarnings("NullableProblems")
         @Override
         public Thread newThread(Runnable r) {
             return new Thread(r, "Job #" + mCount.getAndIncrement());

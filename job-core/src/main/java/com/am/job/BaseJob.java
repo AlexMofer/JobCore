@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.am.job.core;
+package com.am.job;
 
 import java.lang.ref.WeakReference;
 
@@ -21,7 +21,7 @@ import java.lang.ref.WeakReference;
  * 基础任务
  * Created by Alex on 2021/3/1.
  */
-public abstract class BaseJob<C> {
+abstract class BaseJob<C> {
     public static final int PRIORITY_LOW = -1;// 低优先级
     public static final int PRIORITY_MIDDLE = 0; // 中优先级
     public static final int PRIORITY_HIGH = 1;// 高优先级
@@ -465,9 +465,11 @@ public abstract class BaseJob<C> {
     /**
      * 任务
      */
-    public static class Task {
+    public static class Task implements Comparable<Task> {
 
         private BaseJob<?> mJob;
+        private int mPriority;
+        private long mTime;
 
         /**
          * 绑定
@@ -476,6 +478,8 @@ public abstract class BaseJob<C> {
          */
         protected void onAttached(BaseJob<?> job) {
             mJob = job;
+            mPriority = job.getPriority();
+            mTime = System.currentTimeMillis();
         }
 
         /**
@@ -486,6 +490,7 @@ public abstract class BaseJob<C> {
         protected void onDetached(BaseJob<?> job) {
             if (mJob == job) {
                 mJob = null;
+                mTime = 0;
             }
         }
 
@@ -514,6 +519,19 @@ public abstract class BaseJob<C> {
         public void afterExecute(Executor executor) {
             if (mJob != null) {
                 mJob.afterExecute(this);
+            }
+        }
+
+        @Override
+        public int compareTo(Task task) {
+            final int priority = mPriority;
+            final int priorityOther = task.mPriority;
+            if (priority == priorityOther) {
+                return Long.compare(mTime, task.mTime);
+            } else if (priority > priorityOther) {
+                return 1;
+            } else {
+                return -1;
             }
         }
     }
