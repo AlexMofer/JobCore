@@ -20,7 +20,7 @@ package com.am.job;
  * Created by Alex on 2021/3/12.
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
-interface DataArray {
+public interface DataArray {
     /**
      * 设置数据
      *
