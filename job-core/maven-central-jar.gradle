@@ -11,10 +11,36 @@ group = pp.getProperty("POM_GROUP_ID")
 archivesBaseName = pp.getProperty("POM_ARTIFACT_ID")
 version = pp.getProperty("POM_VERSION")
 
-javadoc {
-    options {
-        encoding "UTF-8"
-        charSet 'UTF-8'
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
+
+allprojects {
+    tasks.withType(Javadoc) {
+        options {
+            encoding "UTF-8"
+            charSet 'UTF-8'
+            version pp.getProperty("POM_VERSION")
+            title pp.getProperty("POM_NAME")
+        }
+    }
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
+if (JavaVersion.current().isJava9Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addBooleanOption('html5', true)
+        }
     }
 }
 
@@ -79,10 +105,4 @@ publishing {
 signing {
     useGpgCmd()
     sign publishing.publications.mavenJava
-}
-
-javadoc {
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
 }
